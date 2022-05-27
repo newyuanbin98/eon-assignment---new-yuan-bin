@@ -4,14 +4,14 @@
 				"QuizName":"Demo Question Name",
 				"QuizList":[
 				{
-				"question":"Demo question",
+				"question":"Demo question1",
 				"option_1":"this is correct answer",
 				"option_2":"wrong answer",
 				"option_3":"wrong answer",
 				"answer":1
 				},
 				{
-				"question":"Demo question",
+				"question":"Demo question2",
 				"option_1":"this is correct answer",
 				"option_2":"wrong answer",
 				"option_3":"wrong answer",
@@ -22,14 +22,14 @@
 				"QuizName":"Demo Question Name2",
 				"QuizList":[
 				{
-				"question":"Demo question",
+				"question":"Demo question1",
 				"option_1":"this is correct answer",
 				"option_2":"wrong answer",
 				"option_3":"wrong answer",
 				"answer":1
 				},
 				{
-				"question":"Demo question",
+				"question":"Demo question2",
 				"option_1":"this is correct answer",
 				"option_2":"wrong answer",
 				"option_3":"wrong answer",
