@@ -27,6 +27,11 @@ public class Quiz_Manager : MonoBehaviour
     [SerializeField] InputField quiz_option_3;
     public Button[] pick_answer_btn;
     private int answer = 0;
+    public Button Save_Button;
+
+    [Header("Quiz Preview Panel")]
+    public Quiz_Preview_script QuizPreview_script;
+    public GameObject Quiz_Preview_panel;
 
     [Header("Pop up error message")]
     public GameObject pop_up_msg;
@@ -36,7 +41,7 @@ public class Quiz_Manager : MonoBehaviour
     public Text pop_up_confirm_txt;
     public Button yes_btn;
 
-    private int activeQuiz = 0;
+    public int activeQuiz = 0;
     private int activeQuestion = 0;
     public static Quiz_Manager Instance { get; private set; }
     private void Awake()
@@ -70,40 +75,52 @@ public class Quiz_Manager : MonoBehaviour
             }
         }
     }
-    public void Go_btn(int type, int btnNum)
+    public void Go_btn(int btnNum)
     {
-
+        activeQuiz = btnNum;
+        Preview_Selected_Quiz();
     }
     public void Edit_btn(int type, int btnNum)
     {
+        Save_Button.onClick.RemoveAllListeners();
         if (type == 0) 
         {
             activeQuiz = btnNum;
             Quiz_Detail_panel_Active();
+            Save_Button.onClick.AddListener(() => { addNewItemData(quiz_question.text, quiz_option_1.text, quiz_option_2.text, quiz_option_3.text, answer); });
         }
         else
         {
-
+            activeQuestion = btnNum;
+            Question_detail_panel.SetActive(true);
+            insert_Edit_quiz_details(btnNum);
+            Save_Button.onClick.AddListener(() => { editExistingQuizDetails(activeQuestion, quiz_question.text, quiz_option_1.text, quiz_option_2.text, quiz_option_3.text, answer); });
         }
     }
     public void Delete_btn(int type, int btnNum)
     {
+        yes_btn.onClick.RemoveAllListeners();
         if (type == 0)
             Popup_error_confirm_msg("Confirm delete Quiz?");
         else
             Popup_error_confirm_msg("Confirm delete Question?");
-        yes_btn.onClick.AddListener(() => { ConfirmDeleteQuiz(type,btnNum); });
+        yes_btn.onClick.AddListener(() => { ConfirmDeleteQuiz(type, btnNum); });
     }
     void ConfirmDeleteQuiz(int t, int b)
     {
         if (t == 0)
+        {
             Quiz_Json_Writer.Instance.myItemList.QuizData.RemoveAt(b);
+            Quiz_Json_Writer.Instance.OverwriteQuizData_JSON();
+        }   
         else
+        {
             Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList.RemoveAt(b);
-
-        Quiz_Json_Writer.Instance.OverwriteQuizData_JSON();
+            Quiz_Json_Writer.Instance.OverwriteQuizData_JSON();
+            Quiz_Detail_panel_Active();
+        }
         pop_up_confirm_msg.SetActive(false);
-        Quiz_Detail_panel_Active();
+        //yes_btn.onClick.RemoveAllListeners();
     }
 
     //NEW QUIZ PANEL FUNCTIONS---------------------------------------------------------------------------------------
@@ -144,28 +161,59 @@ public class Quiz_Manager : MonoBehaviour
             PreviewQuiz_obj.SetActive(false);
     }
 
-    //QUESTION DETAILS PANEL FUNCTIONS--------------------------------------------------------------------------
+    //QUESTION DETAILS PANEL FUNCTIONS-------------------------------------------------------------------------------
     public void Pick_Answer_toggle(Button btn)
     {
         answer = int.Parse(btn.name);
-        btn.image.color = new Color(255, 255, 255, 1);
+        btn.image.color = new Color(1, 1, 1, 1);
         Debug.Log("answer picked = " + answer);
         for (int i = 0; i < pick_answer_btn.Length; i++)
         {
             if (pick_answer_btn[i].name != answer.ToString())
-                pick_answer_btn[i].image.color = new Color(255, 255, 255, 0);
+                pick_answer_btn[i].image.color = new Color(1, 1, 1, 0);
+        }
+    }
+    public void insert_Edit_quiz_details(int btn)
+    {
+        quiz_question.text = Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[btn].question;
+        quiz_option_1.text = Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[btn].option_1;
+        quiz_option_2.text = Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[btn].option_2;
+        quiz_option_3.text = Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[btn].option_3;
+        answer = Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[btn].answer;
+        for (int i = 0; i < pick_answer_btn.Length; i++)
+        {
+            pick_answer_btn[i].image.color = new Color(255, 255, 255, 0);
+        }
+        pick_answer_btn[answer - 1].image.color = new Color(255, 255, 255, 1);
+    }
+    public void editExistingQuizDetails(int quizListNum, string q, string o1, string o2, string o3, int an)
+    {
+        if (q == "" || o1 == "" || o2 == "" || o3 == "" || an == 0)
+        {
+            Popup_error_msg("Questionaire Incomplete");
+            return;
+        }
+        else
+        {
+            Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[quizListNum].question = q;
+            Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[quizListNum].option_1 = o1;
+            Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[quizListNum].option_2 = o2;
+            Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[quizListNum].option_3 = o3;
+            Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList[quizListNum].answer = an;
+            Quiz_Json_Writer.Instance.OverwriteQuizData_JSON();
+            Question_detail_panel.SetActive(false);
+            Quiz_Detail_panel_Active();
         }
     }
     public void Save_quiz_details()
     {
-        insertNewItemData(quiz_question.text, quiz_option_1.text, quiz_option_2.text, quiz_option_3.text, answer);
-        Question_detail_panel.SetActive(false);
-        Quiz_Detail_panel_Active();
+        addNewItemData(quiz_question.text, quiz_option_1.text, quiz_option_2.text, quiz_option_3.text, answer);
+        editExistingQuizDetails(activeQuestion, quiz_question.text, quiz_option_1.text, quiz_option_2.text, quiz_option_3.text, answer);
     }
 
-    void insertNewItemData(string q, string o1, string o2, string o3, int an)
+    void addNewItemData(string q, string o1, string o2, string o3, int an)
     {
-        if (q == null || o1 == null || o2 == null || o3 == null || an == 0)
+        if (q == "" || o1 == "" || o2 == "" || o3 == "" || an == 0)
         {
             Popup_error_msg("Questionaire Incomplete");
             return;
@@ -179,22 +227,31 @@ public class Quiz_Manager : MonoBehaviour
             Quiz_Json_Writer.Instance.newItem.answer = an;
             Quiz_Json_Writer.Instance.myItemList.QuizData[activeQuiz].QuizList.Add(Quiz_Json_Writer.Instance.newItem);
             Quiz_Json_Writer.Instance.OverwriteQuizData_JSON();
+            Question_detail_panel.SetActive(false);
+            Quiz_Detail_panel_Active();
         }
     }
 
-    //GLOBAL FUNCTIONS-------------------------------------------------------------------------------------------------
-    void Popup_error_msg(string msg)
+    //QUIZ PREVIEW PANEL FUNCTIONS-----------------------------------------------------------------------------------
+    public void Preview_Selected_Quiz()
+    {
+        Quiz_Preview_panel.SetActive(true);
+        QuizPreview_script.InsertQuestionData();
+    }
+
+    //GLOBAL FUNCTIONS-----------------------------------------------------------------------------------------------
+    public void Popup_error_msg(string msg)
     {
         pop_up_msg.SetActive(true);
         pop_up_txt.text = "Error: " + msg;
     }
-    void Popup_error_confirm_msg(string msg)
+    public void Popup_error_confirm_msg(string msg)
     {
         pop_up_confirm_msg.SetActive(true);
         pop_up_confirm_txt.text = msg;
     }
 
-    void refreshUI()
+    public void refreshUI()
     {
         quiz_name.text = "";
         Quiz_detail_Title.text = "";

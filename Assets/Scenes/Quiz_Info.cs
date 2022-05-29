@@ -27,7 +27,7 @@ public class Quiz_Info : MonoBehaviour
 
     public void GoButton()
     {
-        Quiz_Manager.Instance.Go_btn(Type, btnNum - 1);
+        Quiz_Manager.Instance.Go_btn(btnNum - 1);
     }
     public void EditButton()
     {

@@ -80,11 +80,17 @@ public class Quiz_Json_Writer : MonoBehaviour
         Debug.Log("new json text = " + NEW_JSON_TEXT);
         File.WriteAllText(Application.streamingAssetsPath + "/QuizData.json", NEW_JSON_TEXT);
         Debug.Log(Application.streamingAssetsPath);
+        clearData();
         Quiz_Manager.Instance.instantiateQuiz_main();
         //ReadQuizJsonFile();
         //SceneManager.LoadScene("quiz");
     }
-
+    void clearData()
+    {
+        myItemList = new QuizDataList();
+        newData = new QuizData();
+        newItem = new QuizItem();
+    }
     public void CheckFileExist()
     {
 #if UNITY_IOS || UNITY_ANDROID
