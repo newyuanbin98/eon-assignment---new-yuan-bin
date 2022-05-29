@@ -15,7 +15,7 @@ public class Quiz_Preview_script : MonoBehaviour
 
     public Text Next_btn_text;
     public Button[] pick_answer_btn;
-    int pick;
+    int pick = 0;
     int quizCount = -1;
 
     [Header("Quiz Results Panel")]
@@ -62,10 +62,15 @@ public class Quiz_Preview_script : MonoBehaviour
     public void Next_Button()
     {
         if (pick == 0)
-            Quiz_Manager.Instance.Popup_error_msg("Please retry after picking an answer."); 
+        {
+            Quiz_Manager.Instance.Popup_error_msg("Please retry after picking an answer.");
+            return;
+        }
+            
         if (pick == quiz_answer)
             Correct_Count++;
 
+        pick = 0;
         for (int i = 0; i < pick_answer_btn.Length; i++)
         {
             pick_answer_btn[i].image.color = new Color(1, 1, 1);

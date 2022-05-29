@@ -25,10 +25,6 @@ public class Quiz_Info : MonoBehaviour
         this.question.text = question;
     }
 
-    public void GoButton()
-    {
-        Quiz_Manager.Instance.Go_btn(btnNum - 1);
-    }
     public void EditButton()
     {
         Quiz_Manager.Instance.Edit_btn(Type, btnNum - 1);

@@ -75,11 +75,6 @@ public class Quiz_Manager : MonoBehaviour
             }
         }
     }
-    public void Go_btn(int btnNum)
-    {
-        activeQuiz = btnNum;
-        Preview_Selected_Quiz();
-    }
     public void Edit_btn(int type, int btnNum)
     {
         Save_Button.onClick.RemoveAllListeners();
@@ -274,5 +269,10 @@ public class Quiz_Manager : MonoBehaviour
         {
             pick_answer_btn[i].image.color = new Color(255, 255, 255, 0);
         }
+    }
+
+    public void QuitApplication()
+    {
+        Application.Quit();
     }
 }
